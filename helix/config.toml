@@ -1,8 +1,0 @@
-theme = "everforest_dark"
-# theme = "base16_transparent"
-
-[editor]
-# true-color = true
-
-[editor.lsp]
-display-messages = true

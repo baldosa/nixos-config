@@ -1,6 +1,0 @@
-set main-view-author-display = abbreviated
-set main-view-author-width = 2
-set main-view-date-display = relative-compact
-
-bind generic + !git commit --amend
-bind generic X !rm -i %(file)
