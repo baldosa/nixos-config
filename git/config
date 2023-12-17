@@ -1,11 +1,11 @@
 [user]
-	email = git@fd1.com.ar
-	name = Francisco Demartino
+	email = ema@guillen.com.ar
+	name = Emanuel Guillén
 
 [commit]
 	verbose = true
 [init]
-	defaultBranch = master
+	defaultBranch = main
 [merge]
 	conflictstyle = diff3
 [pull]
