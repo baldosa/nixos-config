@@ -5,19 +5,21 @@ in
 {
     imports = [
         ./hardware-configuration.nix
-        ((builtins.fetchGit {
-          url = "https://github.com/symphorien/nixseparatedebuginfod.git";
-          rev = "466110a37e11a33a3551b44d9da5e323a8924cfa";
-        }) + "/module.nix")
+        <home-manager/nixos>
     ];
-    services.nixseparatedebuginfod.enable = true;
 
+    # nix basic settings
     nix.settings.experimental-features = [ "nix-command" ];
     nix.settings.auto-optimise-store = true;
+    
+    # non free packages
+    nixpkgs.config.allowUnfree = true;
+
 
     boot.loader.systemd-boot.enable = true;
     boot.loader.efi.canTouchEfiVariables = true;
 
+    # power management
     powerManagement.enable = true;    # "stock NixOS power management tool"
     services.thermald.enable = true;  # "prevents overheating on intel cpus"
     services.tlp = {
@@ -40,71 +42,96 @@ in
         STOP_CHARGE_THRESH_BAT1  = 89;
       };
     };
-    networking.hostName = "tatskrow";
-
-    time.timeZone = "America/Buenos_Aires";
-    i18n.defaultLocale = "en_US.UTF-8";
-
-    networking.networkmanager.enable = true;
-
-    hardware.opengl = {
-      enable = true;
-      extraPackages = with pkgs; [
-        intel-media-driver # LIBVA_DRIVER_NAME=iHD
-        vaapiIntel         # LIBVA_DRIVER_NAME=i965
-        vaapiVdpau
-        libvdpau-va-gl
-      ];
-    };
-
-    services.xserver.enable = true;
-    services.xserver.layout = "us";
-    services.xserver.xkbVariant = "altgr-intl";
-
-    # alsa
-    # sound.enable = true;
-
-    # pulse 
-    hardware.pulseaudio.enable = true;
-
-    # TODO: how to get pipewire + xfce pulse plugin? or something that handles volume media keys
-    # # pipewire
-    # # rtkit is optional but recommended
-    # security.rtkit.enable = true;
-    # services.pipewire = {
-    #   enable = true;
-    #   alsa.enable = true;
-    #   alsa.support32Bit = true;
-    #   pulse.enable = true;
-    #   # If you want to use JACK applications, uncomment this
-    #   #jack.enable = true;
-    # };
-
-    services.xserver.libinput.enable = true;
-
-    services.xserver.desktopManager.xfce.enable = true;
-
-    services.xserver.displayManager.autoLogin.enable = true;
-    services.xserver.displayManager.autoLogin.user = "fd";
-    services.xserver.displayManager.defaultSession = "xfce";
-    services.xserver.displayManager.lightdm.enable = true;
-
-    virtualisation = {
-      podman = {
-        enable = true;
-        dockerCompat = true;
-        defaultNetwork.settings.dns_enabled = true;
-      };
-    };
-
-    # hardware.bluetooth.enable = true;
-    # services.blueman.enable = true;
 
     services.tailscale.enable = true;
     services.avahi.enable = true;
 
     services.flatpak.enable = true;
     
+    
+    networking = {
+      hostName = "LOLI";
+      networkmanager.enable = true;
+      firewall.allowedTCPPorts = [ 8000 RTMP_PORT ];
+    }
+
+    # hardware
+    hardware = {
+      opengl = {
+        enable = true;
+        driSupport = true;
+        driSupport32Bit = true;
+      };
+
+      pulseaudio.enable = true;
+
+      nvidia = {
+        # Modesetting is required.
+        modesetting.enable = true;
+
+        # Nvidia power management. Experimental, and can cause sleep/suspend to fail.
+        powerManagement.enable = false;
+        # Fine-grained power management. Turns off GPU when not in use.
+        # Experimental and only works on modern Nvidia GPUs (Turing or newer).
+        powerManagement.finegrained = false;
+
+        # Use the NVidia open source kernel module (not to be confused with the
+        # independent third-party "nouveau" open source driver).
+        # Support is limited to the Turing and later architectures. Full list of
+        # supported GPUs is at:
+        # https://github.com/NVIDIA/open-gpu-kernel-modules#compatible-gpus
+        # Only available from driver 515.43.04+
+        # Do not disable this unless your GPU is unsupported or if you have a good reason to.
+        # open = true;
+
+        # Enable the Nvidia settings menu,
+        # accessible via `nvidia-settings`.
+        nvidiaSettings = true;
+
+        # Optionally, you may need to select the appropriate driver version for your specific GPU.
+        package = config.boot.kernelPackages.nvidiaPackages.stable;
+      };
+
+      bluetooth.enable = true;
+    }
+
+
+    # services.blueman.enable = true;
+
+    # xserver settings
+    services.xserver = {
+      enable = true;
+      layout = "us";
+      xkbVariant = "altgr-intl";
+      libinput.enable = true;
+
+      desktopManager.xfce.enable = true;
+      
+      displayManager = {
+        defaultSession = "none+i3";
+        autoLogin = { 
+          enable = false; 
+        }; 
+        lightdm = { 
+          enable = true; 
+          greeter.enable = true; 
+          greeters.slick.enable = true;
+        }; 
+      };
+
+      windowManager.i3 = {
+        enable = true;
+        extraPackages = with pkgs; [
+          dmenu #application launcher most people use
+          i3status # gives you the default i3 status bar
+          i3lock #default i3 screen locker
+          i3blocks #if you are planning on using i3blocks over i3status
+        ];
+      };
+      videoDrivers = ["nvidia"];   
+
+    };
+       
     xdg.portal = {
       enable = true;
       wlr.enable = true;
@@ -112,73 +139,9 @@ in
       extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
     };
 
-    fonts.fonts = with pkgs; [
-        iosevka
-        terminus_font_ttf
-    ];
-
-    programs.fish.enable = true;
-    users.defaultUserShell = pkgs.fish;
-
-    users.users.fd = {
-        useDefaultShell = true;
-        isNormalUser = true;  # home and stuff, not isSystemuser
-        extraGroups = [ "wheel" ];
-        packages = with pkgs; [
-            age
-            alacritty
-            dmenu
-            entr
-            fd
-            fx
-            fzf
-            ghc
-            gimp
-            git
-            git-absorb
-            gnumake
-            goaccess
-            graphviz
-            helix
-            jq
-            libyaml
-            man-pages
-            mono
-            mpv
-            ncdu
-            nnn
-            obs-studio
-            pandoc
-            passage
-            pdfslicer
-            peek
-            podman-compose
-            psmisc
-            python3
-            qbittorrent
-            ranger
-            ripgrep
-            ruby
-            subdl
-            syncthing
-            texlive.combined.scheme-tetex
-            tig
-            tigervnc
-            tree
-            vncdo
-            w3m
-            xarchiver
-            xclip
-            xdotool
-            # xfce.xfce4-pulseaudio-plugin  # xfce.nix looks for pulse to include this
-            xonotic
-            xorg.xkill
-            yt-dlp
-            zathura
-        ];
-    };
 
     environment.shells = [ pkgs.fish ];
+    environment.pathsToLink = [ "/libexec" ];
     environment.systemPackages = with pkgs; [
         (let base = pkgs.appimageTools.defaultFhsEnvArgs; in 
             pkgs.buildFHSUserEnv (base // {
@@ -187,27 +150,44 @@ in
               profile = "export FHS=1"; 
               runScript = "fish"; 
               extraOutputsToInstall = ["dev"]; }))
-        chromium
-        file
-        firefox
-        fish
+    
+        ((vscode.override { isInsiders = true; }).overrideAttrs (oldAttrs: rec {
+          src = (builtins.fetchTarball {
+            url = "https://code.visualstudio.com/sha/download?build=insider&os=linux-x64";
+            sha256 = "09dykbnlm0r7317iv03dpi9f1vxxy6l8lagf6ssaqa2rbxly5zy4";
+          });
+          version = "latest";
+
+          buildInputs = oldAttrs.buildInputs ++ [ pkgs.krb5 ];
+        })).fhs
+        alacritty
+        gnumake
+        i3
         htop
+        killall
+        libsecret
         moreutils
         nix-direnv
         nix-index
-        tmux
-        qrencode
-        unclutter
+        nixpkgs-fmt
+        p7zip
+        rofi
         unzip
         vim-full
         wget
+        xdotool
+        yad
         zip
     ];
+    
 
     environment.variables = {
       EDITOR = "vim";
       MOZ_USE_XINPUT2 = "1";
     };
+
+    time.timeZone = "America/Buenos_Aires";
+    i18n.defaultLocale = "en_US.UTF-8";
 
     programs.direnv = {
       enable = true;
@@ -216,45 +196,30 @@ in
         package = pkgs.nix-direnv;
       };
     };
+    programs.fish.enable = true;
 
-    services.nginx = {
-      enable = true;
-      additionalModules = [ pkgs.nginxModules.rtmp ];
-      appendConfig = ''
-        rtmp {
-          server {
-            listen ${builtins.toString RTMP_PORT};
-            chunk_size 4096;
+    fonts.packages = with pkgs; [
+        iosevka
+        terminus_font_ttf
+    ];
 
-            application cine {
-              live on;
-              record off;
-            }
-          }
-        } 
-      '';
+    users.defaultUserShell = pkgs.fish;
+    users.users.baldosa = {
+        useDefaultShell = true;
+        isNormalUser = true;  # home and stuff, not isSystemuser
+        extraGroups = [ "wheel" ];
+        packages = with pkgs; [
+            git
+            git-absorb
+            jq
+            python3
+        ];
+        
     };
 
-    # Some programs need SUID wrappers, can be configured further or are
-    # started in user sessions.
-    # programs.mtr.enable = true;
-    # programs.gnupg.agent = {
-    #   enable = true;
-    #   enableSSHSupport = true;
-    # };
 
-    # Open ports in the firewall.
-    networking.firewall.allowedTCPPorts = [ 8000 RTMP_PORT ];
-    # networking.firewall.allowedUDPPorts = [ ... ];
-    # Or disable the firewall altogether.
-    # networking.firewall.enable = false;
-
-    # (to /run/current-system/configuration.nix)
     system.copySystemConfiguration = true;
 
-    # Before changing this value read the documentation for this option
-    # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-    system.stateVersion = "23.05"; # Did you read the comment?
-
+    system.stateVersion = "23.11"; # Did you read the comment?
 }
 
