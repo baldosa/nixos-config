@@ -53,17 +53,16 @@ in
       hostName = "LOLI";
       networkmanager.enable = true;
       firewall.allowedTCPPorts = [ 8000 RTMP_PORT ];
-    }
+    };
 
     # hardware
+    hardware.opengl = {
+      enable = true;
+      driSupport = true;
+      driSupport32Bit = true;
+    };
+      
     hardware = {
-      opengl = {
-        enable = true;
-        driSupport = true;
-        driSupport32Bit = true;
-      };
-
-      pulseaudio.enable = true;
 
       nvidia = {
         # Modesetting is required.
@@ -92,8 +91,9 @@ in
         package = config.boot.kernelPackages.nvidiaPackages.stable;
       };
 
+      pulseaudio.enable = true;
       bluetooth.enable = true;
-    }
+    };
 
 
     # services.blueman.enable = true;
