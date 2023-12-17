@@ -1,0 +1,55 @@
+command=$SCRIPT_DIR/$BLOCK_NAME/$BLOCK_NAME
+separator_block_width=15
+markup=none
+
+[keyindicator]
+KEY=CAPS
+interval=10
+markup=pango
+signal=11
+HIDE_WHEN_OFF=1
+
+[volume]
+label=♪ 
+interval=once
+signal=10
+
+[calendar]
+interval=30
+LABEL=📅 
+DATEFMT=+%Y-%m-%d %H:%M
+HEIGHT=180
+WIDTH=220
+
+[shutdown_menu]
+full_text=【⏻】
+# If you are using FontAwesome, we recommend the power-off icon:
+# http://fontawesome.io/icon/power-off/
+#FG_COLOR=#bbbbbb
+#BG_COLOR=#111111
+#HLFG_COLOR=#111111
+#HLBG_COLOR=#bbbbbb
+#BORDER_COLOR=#222222
+#LAUNCHER=rofi (must be rofi or zenity)
+#ROFI_TEXT=Menu:
+#ROFI_OPTIONS=-width 11 -location 3 -hide-scrollbar -bw 2
+ENABLE_CONFIRMATIONS=true
+LOCKSCRIPT=dm-tool lock
+
+
+
+# Generic media player support
+#
+# This displays "ARTIST - SONG" if a music is playing.
+# Supported players are: spotify, vlc, audacious, xmms2, mplayer, and others.
+# Set to %any to automatically pick (Requires playerctl >=2.1.1)
+#[mediaplayer]
+# This picks any player, with vlc as first, and spotify as last choice
+#instance=vlc,%any,spotify
+#interval=5
+#signal=10
+
+#KEY=CAPS
+#markup=pango
+#interval=once
+#signal=11
