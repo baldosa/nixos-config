@@ -7,7 +7,7 @@ install:
 	nix-channel --update
 	nix-shell '<home-manager>' -A install
 
-xcopy.home:
+copy.home:
 	cp home.nix ~/.config/home-manager/home.nix
 
 rebuild.home:
@@ -22,7 +22,7 @@ rebuild:
 
 grab:
 	cp /etc/nixos/configuration.nix .
-asdal
+
 update:
 	sudo nix-channel --update
 
