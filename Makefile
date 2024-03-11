@@ -1,5 +1,19 @@
 apply: copy rebuild
 
+home: copy.home rebuild.home
+
+install:
+	nix-channel --add https://github.com/nix-community/home-manager/archive/release-23.11.tar.gz home-manager
+	nix-channel --update
+	nix-shell '<home-manager>' -A install
+
+xcopy.home:
+	cp home.nix ~/.config/home-manager/home.nix
+
+rebuild.home:
+	home-manager build
+	home-manager switch
+
 copy:
 	sudo cp configuration.nix /etc/nixos/configuration.nix
 
@@ -8,12 +22,9 @@ rebuild:
 
 grab:
 	cp /etc/nixos/configuration.nix .
-
+asdal
 update:
 	sudo nix-channel --update
 
 cleanup:
 	sudo nix-collect-garbage --delete-older-than 14d
-
-iso:
-	NIXPKGS_ALLOW_UNFREE=1 nix-build '<nixpkgs/nixos>' -A config.system.build.isoImage -I nixos-config=iso.nix

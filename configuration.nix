@@ -5,7 +5,6 @@ in
 {
   imports = [
     ./hardware-configuration.nix
-    <home-manager/nixos>
   ];
 
   # nix basic settings
@@ -15,9 +14,9 @@ in
   # non free packages
   nixpkgs.config.allowUnfree = true;
 
-
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  boot.initrd.kernelModules = [ "amdgpu" ];
 
   # power management
   powerManagement.enable = true; # "stock NixOS power management tool"
@@ -45,12 +44,11 @@ in
 
   services.tailscale.enable = true;
   services.avahi.enable = true;
-
   services.flatpak.enable = true;
 
 
   networking = {
-    hostName = "LOLI";
+    hostName = "yogakon";
     networkmanager.enable = true;
     firewall.allowedTCPPorts = [ 8000 RTMP_PORT ];
   };
@@ -64,40 +62,14 @@ in
 
   hardware = {
 
-    nvidia = {
-      # Modesetting is required.
-      modesetting.enable = true;
-
-      # Nvidia power management. Experimental, and can cause sleep/suspend to fail.
-      powerManagement.enable = false;
-      # Fine-grained power management. Turns off GPU when not in use.
-      # Experimental and only works on modern Nvidia GPUs (Turing or newer).
-      powerManagement.finegrained = false;
-
-      # Use the NVidia open source kernel module (not to be confused with the
-      # independent third-party "nouveau" open source driver).
-      # Support is limited to the Turing and later architectures. Full list of
-      # supported GPUs is at:
-      # https://github.com/NVIDIA/open-gpu-kernel-modules#compatible-gpus
-      # Only available from driver 515.43.04+
-      # Do not disable this unless your GPU is unsupported or if you have a good reason to.
-      # open = true;
-
-      # Enable the Nvidia settings menu,
-      # accessible via `nvidia-settings`.
-      nvidiaSettings = true;
-
-      # Optionally, you may need to select the appropriate driver version for your specific GPU.
-      package = config.boot.kernelPackages.nvidiaPackages.stable;
-    };
-
     pulseaudio.enable = true;
     bluetooth.enable = true;
   };
 
+  virtualisation.docker.enable = true;
 
-  # services.blueman.enable = true;
-
+  services.blueman.enable = true;
+  services.gnome.gnome-keyring.enable = true;
   # xserver settings
   services.xserver = {
     enable = true;
@@ -105,10 +77,15 @@ in
     xkbVariant = "altgr-intl";
     libinput.enable = true;
 
-    desktopManager.xfce.enable = true;
-
+    desktopManager = {
+      xfce = {
+        enable = true;
+        noDesktop = true;
+        enableXfwm = false;
+      };
+    };
     displayManager = {
-      defaultSession = "none+i3";
+      defaultSession = "xfce+i3";
       autoLogin = {
         enable = false;
       };
@@ -123,12 +100,11 @@ in
       enable = true;
       extraPackages = with pkgs; [
         dmenu #application launcher most people use
-        i3status # gives you the default i3 status bar
-        i3lock #default i3 screen locker
+        i3status
         i3blocks #if you are planning on using i3blocks over i3status
       ];
     };
-    videoDrivers = [ "nvidia" ];
+    videoDrivers = [ "amdgpu" ];
 
   };
 
@@ -153,17 +129,6 @@ in
         extraOutputsToInstall = [ "dev" ];
       })
     )
-
-    ((vscode.override { isInsiders = true; }).overrideAttrs (oldAttrs: rec {
-      src = (builtins.fetchTarball {
-        url = "https://code.visualstudio.com/sha/download?build=insider&os=linux-x64";
-        sha256 = "09dykbnlm0r7317iv03dpi9f1vxxy6l8lagf6ssaqa2rbxly5zy4";
-      });
-      version = "latest";
-
-      buildInputs = oldAttrs.buildInputs ++ [ pkgs.krb5 ];
-    })).fhs
-    alacritty
     gnumake
     i3
     htop
@@ -181,13 +146,13 @@ in
     xdotool
     yad
     zip
+    google-chrome
+    python3
+    git
+    git-absorb
+    jq
   ];
 
-
-  environment.variables = {
-    EDITOR = "vim";
-    MOZ_USE_XINPUT2 = "1";
-  };
 
   time.timeZone = "America/Buenos_Aires";
   i18n.defaultLocale = "en_US.UTF-8";
@@ -201,29 +166,12 @@ in
   };
   programs.fish.enable = true;
 
-  programs.steam = {
-    enable = true;
-  };
-  fonts.packages = with pkgs; [
-    iosevka
-    terminus_font_ttf
-  ];
-
   users.defaultUserShell = pkgs.fish;
   users.users.baldosa = {
     useDefaultShell = true;
     isNormalUser = true; # home and stuff, not isSystemuser
     extraGroups = [ "wheel" ];
-    packages = with pkgs; [
-      git
-      git-absorb
-      jq
-      python3
-    ];
-
   };
-
-
   system.copySystemConfiguration = true;
 
   system.stateVersion = "23.11"; # Did you read the comment?
