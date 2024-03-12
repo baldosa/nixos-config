@@ -152,7 +152,10 @@ in
     git-absorb
     jq
   ];
-
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+  };
 
   time.timeZone = "America/Buenos_Aires";
   i18n.defaultLocale = "en_US.UTF-8";
