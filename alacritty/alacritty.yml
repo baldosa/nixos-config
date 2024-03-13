@@ -1,18 +1,18 @@
 font:
   normal:
-    family: Terminus (TTF)
+    family: "Terminus (TTF)"
     style: Regular
 
   bold:
-    family: Terminus (TTF)
+    family: "Terminus (TTF)"
     style: Bold
 
   italic:
-    family: Terminus (TTF)
+    family: "Terminus (TTF)"
     style: Italic
 
   bold_italic:
-    family: Terminus (TTF)
+    family: "Terminus (TTF)"
     style: Bold Italic
 
   size: 8
