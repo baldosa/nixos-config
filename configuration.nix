@@ -58,6 +58,11 @@ in
     enable = true;
     driSupport = true;
     driSupport32Bit = true;
+    amdgpu.loadInInitrd = true;
+    opengl.extraPackages = with pkgs; [
+      vaapiVdpau
+      libvdpau-va-gl
+    ];
   };
 
   hardware = {
@@ -139,9 +144,7 @@ in
     nix-index
     nixpkgs-fmt
     p7zip
-    rofi
     unzip
-    vim-full
     wget
     xdotool
     yad
