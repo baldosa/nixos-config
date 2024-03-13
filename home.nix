@@ -14,6 +14,7 @@
   home.homeDirectory = "/home/baldosa";
 
 
+
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
   # introduces backwards incompatible changes.
@@ -42,6 +43,9 @@
     iosevka
     terminus_font_ttf
     mupdf
+    volantes-cursors
+    minecraft
+    rofi
     # (pkgs.nerdfonts.override { fonts = [ "FantasqueSansMono" ]; })
     # # You can also create simple shell scripts directly inside your
     # # configuration. For example, this adds a command 'my-hello' to your
@@ -51,23 +55,23 @@
     # '')
   ];
   fonts.fontconfig.enable = true;
-
+  # home.pointerCursor = 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
   home.file = {
 
     ".config/i3" = {
-      source = /home/baldosa/nixos-config/i3;
-      recursive = true;
+      source = config.lib.file.mkOutOfStoreSymlink "/home/baldosa/nixos-config/i3";
+      # recursive = true;
     };
     ".config/i3blocks" = {
-      source = /home/baldosa/nixos-config/i3blocks;
-      recursive = true;
-      executable = true;
+      source = config.lib.file.mkOutOfStoreSymlink "/home/baldosa/nixos-config/i3blocks";
+      # recursive = true;
+      # executable = true;
     };
     ".config/alacritty" = {
-      source = /home/baldosa/nixos-config/alacritty;
-      recursive = true;
+      source = config.lib.file.mkOutOfStoreSymlink "/home/baldosa/nixos-config/alacritty";
+      # recursive = true;
     };
 
   };
@@ -84,7 +88,7 @@
   #  /etc/profiles/per-user/baldosa/etc/profile.d/hm-session-vars.sh
   #
   home.sessionVariables = {
-    EDITOR = "vim";
+    EDITOR = "nvim";
     MOZ_USE_XINPUT2 = "1";
   };
 
