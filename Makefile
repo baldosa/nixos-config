@@ -1,4 +1,6 @@
-apply: copy rebuild
+apply: update os home 
+
+os: copy rebuild
 
 home: copy.home rebuild.home
 
