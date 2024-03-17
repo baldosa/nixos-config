@@ -58,15 +58,16 @@ in
     enable = true;
     driSupport = true;
     driSupport32Bit = true;
-    amdgpu.loadInInitrd = true;
-    opengl.extraPackages = with pkgs; [
+    extraPackages = with pkgs; [
       vaapiVdpau
       libvdpau-va-gl
     ];
   };
+  # microcode
+  hardware.cpu.amd.updateMicrocode =
+    config.hardware.enableRedistributableFirmware;
 
   hardware = {
-
     pulseaudio.enable = true;
     bluetooth.enable = true;
   };
@@ -75,6 +76,8 @@ in
 
   services.blueman.enable = true;
   services.gnome.gnome-keyring.enable = true;
+  services.fstrim.enable = true;
+
   # xserver settings
   services.xserver = {
     enable = true;
@@ -135,7 +138,6 @@ in
       })
     )
     gnumake
-    i3
     htop
     killall
     libsecret
@@ -149,7 +151,6 @@ in
     xdotool
     yad
     zip
-    google-chrome
     python3
     git
     git-absorb
@@ -176,7 +177,10 @@ in
   users.users.baldosa = {
     useDefaultShell = true;
     isNormalUser = true; # home and stuff, not isSystemuser
-    extraGroups = [ "wheel" ];
+    extraGroups = [
+      "wheel"
+      "docker"
+    ];
   };
   system.copySystemConfiguration = true;
 

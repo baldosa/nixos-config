@@ -36,6 +36,7 @@
 
       buildInputs = oldAttrs.buildInputs ++ [ pkgs.krb5 ];
     })).fhs
+    google-chrome
     alacritty
     libreoffice-fresh
     stalonetray
