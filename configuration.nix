@@ -153,6 +153,7 @@ in
     zip
     python3
     git
+    google-chrome
     git-absorb
     jq
   ];
